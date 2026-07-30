@@ -21,6 +21,10 @@ public class PlayerController : MonoBehaviour
     private Vector3 originalGunPosition;
     private Vector3 velocity; // Handles gravity acceleration
 
+    [Header("Effects & Audio")]
+    public GameObject muzzleFlashPrefab; // Visual flash (Particle System)
+    public AudioSource gunAudioSource;   // The AudioSource component on the gun
+    public AudioClip shootSound;         // The gunshot sound file (.wav / .mp3)
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -134,18 +138,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void CreateMuzzleFlash()
+ void CreateMuzzleFlash()
+{
+    // 1. Play the visual particle flash if assigned
+    if (muzzleFlashPrefab != null && muzzlePoint != null)
     {
-        GameObject flashLight = new GameObject("MuzzleFlashLight");
-        flashLight.transform.position = muzzlePoint.position;
-        Light lightComp = flashLight.AddComponent<Light>();
-        lightComp.type = LightType.Point;
-        lightComp.color = Color.yellow;
-        lightComp.range = 5f;
-        lightComp.intensity = 8f;
-
-        Destroy(flashLight, 0.05f);
+        GameObject flash = Instantiate(muzzleFlashPrefab, muzzlePoint.position, muzzlePoint.rotation, muzzlePoint);
+        Destroy(flash, 0.1f); // Quick cleanup
     }
+
+    // 2. Play the gunshot sound
+    if (gunAudioSource != null && shootSound != null)
+    {
+        gunAudioSource.PlayOneShot(shootSound);
+    }
+}
 
     void CreateHitImpact(Vector3 point, Vector3 normal)
     {
