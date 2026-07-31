@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class EnemyRewardTarget : MonoBehaviour, IDamageable
 {
-    [Header("Enemy Stats")]
+    [Header("Health")]
     public float maxHealth = 50f;
     private float currentHealth;
 
-    [Header("Loot Drop")]
+    [Header("Reward Settings")]
     public GameObject rewardPrefab;
 
     private void Start()
@@ -17,9 +17,9 @@ public class EnemyRewardTarget : MonoBehaviour, IDamageable
     public void TakeDamage(DamagePayload payload)
     {
         currentHealth -= payload.amount;
-        Debug.Log($"{gameObject.name} took {payload.amount} {payload.type} damage! Remaining HP: {currentHealth}");
+        Debug.Log($"[ENEMY] Took {payload.amount} damage ({payload.type}). Health remaining: {currentHealth}");
 
-        if (currentHealth <= 0f)
+        if (currentHealth <= 0)
         {
             Die();
         }
@@ -29,19 +29,20 @@ public class EnemyRewardTarget : MonoBehaviour, IDamageable
     {
         if (rewardPrefab != null)
         {
-            // Spawn loot slightly above enemy center
-            GameObject loot = Instantiate(rewardPrefab, transform.position + Vector3.up * 1f, Quaternion.identity);
-            
-            // Give the spawned loot a small upward/random pop impulse
-            Rigidbody lootRb = loot.GetComponent<Rigidbody>();
-            if (lootRb != null)
+            GameObject reward = Instantiate(rewardPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+            Rigidbody rewardRb = reward.GetComponent<Rigidbody>();
+            if (rewardRb != null)
             {
-                Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), 2f, Random.Range(-1f, 1f)).normalized;
-                lootRb.AddForce(randomDirection * 3f, ForceMode.Impulse);
+                // Upward pop with minimal horizontal scatter
+                Vector3 spawnForce = new Vector3(
+                    Random.Range(-0.5f, 0.5f),
+                    3.0f,
+                    Random.Range(-0.5f, 0.5f)
+                );
+                rewardRb.AddForce(spawnForce, ForceMode.Impulse);
             }
         }
 
-        Debug.Log($"{gameObject.name} eliminated!");
         Destroy(gameObject);
     }
 }
