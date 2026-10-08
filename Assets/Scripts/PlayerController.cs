@@ -171,11 +171,12 @@ public class PlayerController : MonoBehaviour, IDamageable
             CreateMuzzleFlash();
 
             RaycastHit hit;
-            if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, attackRange))
+            if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, attackRange, ~0, QueryTriggerInteraction.Ignore))
             {
                 CreateHitImpact(hit.point, hit.normal);
 
-                IDamageable target = hit.transform.GetComponentInParent<IDamageable>();
+                // Search up from the collider so hits on child colliders (limbs, armor) still find the damageable root
+                IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
                 if (target != null)
                 {
                     DamagePayload payload = new DamagePayload
@@ -227,6 +228,7 @@ void CreateHitImpact(Vector3 point, Vector3 normal)
         if (rend != null)
         {
             rend.material.color = Color.yellow;
+            Destroy(rend.material, 0.2f); // .material creates an instance that isn't cleaned up with the object
         }
 
         Destroy(impact, 0.2f);
