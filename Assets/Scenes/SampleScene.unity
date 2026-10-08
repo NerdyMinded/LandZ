@@ -972,7 +972,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50942c93d43d2e64ca8bdc5490bcfed1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
-  maxHealth: 100
+  maxHealth: 50
 --- !u!114 &1104324815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -985,7 +985,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 685d815b808024143b9badd2664362a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRewardTarget
-  maxHealth: 50
   rewardPrefab: {fileID: 0}
 --- !u!54 &1104324816
 Rigidbody:
@@ -1167,7 +1166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50942c93d43d2e64ca8bdc5490bcfed1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
-  maxHealth: 100
+  maxHealth: 50
 --- !u!114 &1591023089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1180,7 +1179,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 685d815b808024143b9badd2664362a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRewardTarget
-  maxHealth: 50
   rewardPrefab: {fileID: 4724405834717446578, guid: bcb7c4b56fc37d248a14736523c83211, type: 3}
 --- !u!54 &1591023090
 Rigidbody:
@@ -1362,7 +1360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50942c93d43d2e64ca8bdc5490bcfed1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
-  maxHealth: 100
+  maxHealth: 150
 --- !u!114 &2086213367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1375,7 +1373,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 685d815b808024143b9badd2664362a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRewardTarget
-  maxHealth: 150
   rewardPrefab: {fileID: 4724405834717446578, guid: bcb7c4b56fc37d248a14736523c83211, type: 3}
 --- !u!54 &2086213368
 Rigidbody:
