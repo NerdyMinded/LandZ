@@ -1,47 +1,64 @@
+using System;
 using UnityEngine;
 
+// Single source of truth for health on anything that can be damaged (player, enemies, props).
+// Other components react to damage/death through the events instead of tracking health themselves.
 public class HealthSystem : MonoBehaviour, IDamageable
 {
     [Header("Health Settings")]
     [SerializeField] private float maxHealth = 100f;
-    private float currentHealth;
+    [Tooltip("Destroy the GameObject on death. If off, it is deactivated instead (useful for the player / respawning).")]
+    [SerializeField] private bool destroyOnDeath = true;
 
-    private void Start()
+    public float MaxHealth => maxHealth;
+    public float CurrentHealth { get; private set; }
+    public bool IsDead { get; private set; }
+
+    public event Action<DamagePayload> Damaged;
+    public event Action Died;
+
+    private void Awake()
     {
-        currentHealth = maxHealth;
+        CurrentHealth = maxHealth;
     }
 
     public void TakeDamage(DamagePayload payload)
     {
-        // Apply damage logic based on elemental type
+        if (IsDead) return;
+
+        // Elemental modifiers (resistances, burn, etc.) will hook in here
         float finalDamage = payload.amount;
 
-        // Example: Handle specific elemental modifiers
-        switch (payload.type)
-        {
-            case DamageType.Fire:
-                Debug.Log($"{gameObject.name} took {finalDamage} FIRE damage! (Burn effect queued)");
-                break;
-            case DamageType.Toxic:
-                Debug.Log($"{gameObject.name} took {finalDamage} TOXIC damage!");
-                break;
-            default:
-                Debug.Log($"{gameObject.name} took {finalDamage} physical damage.");
-                break;
-        }
+        CurrentHealth = Mathf.Max(CurrentHealth - finalDamage, 0f);
+        Debug.Log($"{gameObject.name} took {finalDamage} {payload.type} damage. Health: {CurrentHealth}/{maxHealth}");
 
-        currentHealth -= finalDamage;
-        Debug.Log($"{gameObject.name} Health Remaining: {currentHealth}/{maxHealth}");
+        Damaged?.Invoke(payload);
 
-        if (currentHealth <= 0f)
+        if (CurrentHealth <= 0f)
         {
             Die();
         }
     }
 
+    public void Heal(float amount)
+    {
+        if (IsDead) return;
+        CurrentHealth = Mathf.Min(CurrentHealth + amount, maxHealth);
+    }
+
     private void Die()
     {
+        IsDead = true;
         Debug.Log($"{gameObject.name} was destroyed!");
-        gameObject.SetActive(false); // Can be replaced with ragdoll or destroy call
+        Died?.Invoke();
+
+        if (destroyOnDeath)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

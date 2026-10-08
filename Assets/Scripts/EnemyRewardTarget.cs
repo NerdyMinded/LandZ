@@ -1,48 +1,44 @@
 using UnityEngine;
 
-public class EnemyRewardTarget : MonoBehaviour, IDamageable
+// Drops a reward when the attached HealthSystem dies. Health itself lives on HealthSystem.
+[RequireComponent(typeof(HealthSystem))]
+public class EnemyRewardTarget : MonoBehaviour
 {
-    [Header("Health")]
-    public float maxHealth = 50f;
-    private float currentHealth;
-
     [Header("Reward Settings")]
     public GameObject rewardPrefab;
 
-    private void Start()
+    private HealthSystem health;
+
+    private void Awake()
     {
-        currentHealth = maxHealth;
+        health = GetComponent<HealthSystem>();
     }
 
-    public void TakeDamage(DamagePayload payload)
+    private void OnEnable()
     {
-        currentHealth -= payload.amount;
-        Debug.Log($"[ENEMY] Took {payload.amount} damage ({payload.type}). Health remaining: {currentHealth}");
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        health.Died += DropReward;
     }
 
-    private void Die()
+    private void OnDisable()
     {
-        if (rewardPrefab != null)
-        {
-            GameObject reward = Instantiate(rewardPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
-            Rigidbody rewardRb = reward.GetComponent<Rigidbody>();
-            if (rewardRb != null)
-            {
-                // Upward pop with minimal horizontal scatter
-                Vector3 spawnForce = new Vector3(
-                    Random.Range(-0.5f, 0.5f),
-                    3.0f,
-                    Random.Range(-0.5f, 0.5f)
-                );
-                rewardRb.AddForce(spawnForce, ForceMode.Impulse);
-            }
-        }
+        health.Died -= DropReward;
+    }
 
-        Destroy(gameObject);
+    private void DropReward()
+    {
+        if (rewardPrefab == null) return;
+
+        GameObject reward = Instantiate(rewardPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        Rigidbody rewardRb = reward.GetComponent<Rigidbody>();
+        if (rewardRb != null)
+        {
+            // Upward pop with minimal horizontal scatter
+            Vector3 spawnForce = new Vector3(
+                Random.Range(-0.5f, 0.5f),
+                3.0f,
+                Random.Range(-0.5f, 0.5f)
+            );
+            rewardRb.AddForce(spawnForce, ForceMode.Impulse);
+        }
     }
 }

@@ -13,6 +13,7 @@ public class LootItem : MonoBehaviour
 
     private Transform playerTransform;
     private Rigidbody rb;
+    private bool isMagnetized; // Once pulled, keep flying to the player even if they move out of range
 
     private void Awake()
     {
@@ -35,14 +36,18 @@ public class LootItem : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, playerTransform.position);
 
-        // When inside magnet radius, pull item toward player
-        if (distance <= magnetRadius)
+        if (!isMagnetized && distance <= magnetRadius)
         {
+            isMagnetized = true;
             if (rb != null)
             {
                 rb.isKinematic = true; // Disable physics forces while pulling
             }
+        }
 
+        // Pull item toward player
+        if (isMagnetized)
+        {
             transform.position = Vector3.MoveTowards(
                 transform.position, 
                 playerTransform.position + Vector3.up * 1.0f,
@@ -66,6 +71,9 @@ public class LootItem : MonoBehaviour
 
     private void Collect()
     {
+        if (!enabled) return; // Guard against collecting twice in one frame (trigger + distance)
+        enabled = false;
+
         Debug.Log($"[REWARD COLLECTED] {amount} {itemName}!");
         Destroy(gameObject);
     }
